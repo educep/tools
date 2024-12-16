@@ -1,0 +1,5 @@
+# Require review from specific users for all changes
+* @educep
+
+# Protect all files in all directories
+**/* @educep

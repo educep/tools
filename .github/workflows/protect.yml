@@ -1,0 +1,17 @@
+name: Protect Main Branch
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  protect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Check authorized users
+        run: |
+          if [[ "${{ github.actor }}" != "educep" ]]; then
+            echo "Unauthorized contribution attempt"
+            exit 1
+          fi
