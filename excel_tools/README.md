@@ -56,12 +56,11 @@ This repository will be updated with additional Excel tools and utilities as the
 Feel free to submit issues and enhancement requests!
 
 ## License
-[Your chosen license]
+MIT License
 
 ## Contact
-[Your contact information]
+solutions@datoscout.ec
+contact@analitika.fr
 
 ---
 *Note: Keep your API keys secure and never commit them to version control.*
-
-Would you like me to add or modify any sections of the README?
