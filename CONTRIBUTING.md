@@ -6,4 +6,4 @@ explicitly requested.
 
 ## Usage
 - You may fork this repository for personal use
-- Redistributing the code is not allowed
+

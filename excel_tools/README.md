@@ -59,8 +59,8 @@ Feel free to submit issues and enhancement requests!
 MIT License
 
 ## Contact
-solutions@datoscout.ec
-contact@analitika.fr
+ - solutions@datoscout.ec
+ - contact@analitika.fr
 
 ---
 *Note: Keep your API keys secure and never commit them to version control.*
