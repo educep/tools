@@ -16,7 +16,7 @@ from loguru import logger
 from PIL import Image
 
 # Internal imports
-from tools.config import (
+from config import (
     AWS_ACCESS_KEY_ID,
     AWS_REGION,
     AWS_SECRET_ACCESS_KEY,
