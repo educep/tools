@@ -7,7 +7,7 @@ from celery import Celery
 import urllib.parse
 
 # Internal imports
-from config.settings import (
+from config import (
     AWS_ACCOUNT_ID,
     AWS_ACCESS_KEY_SQS_ID,
     AWS_SECRET_ACCESS_SQS_KEY,
@@ -18,13 +18,14 @@ from config.settings import (
 """
 $env:AWS_PROFILE = "ank"
 aws sqs list-queues --region eu-west-3
-.\activate_pws.ps1
-celery -A config.celery worker --pool=solo --loglevel=info
-celery -A config.celery inspect registered
+celery -A async_tasks.celery worker --pool=solo --loglevel=info
+celery -A async_tasks.celery inspect registered
 
-from config.celery import test_task
-from webapp.tasks import test_task_child
-test_task_child.delay()
+from async_tasks.celery import test_task
+test_task.delay()
+# don't forget to add folders_with_tasks so that
+# from folders_with_tasks.tasks import test_task_child
+# test_task_child.delay()
 """
 
 # URL-encode the AWS secret key and access key
@@ -50,10 +51,12 @@ celery_app = Celery(
         },
     },
     task_create_missing_queues=False,
-    worker_disable_remote_control=True,  # <--- Add this line
+    worker_disable_remote_control=True,
 )
 
-celery_app.autodiscover_tasks(["webapp"])
+# here add the folder of your project with tasks
+folders_with_tasks = []
+celery_app.autodiscover_tasks(folders_with_tasks)
 
 
 @celery_app.task
