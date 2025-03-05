@@ -1,0 +1,15 @@
+
+
+# AWS PACKAGE
+boto3==1.35.29
+# GENERAL USE
+# LOGGING
+loguru==0.7.2
+pandas==2.2.2
+pillow==11.0.0
+
+# LINTERS
+pre-commit==3.7.0
+
+# UTILS
+python-dotenv==1.0.1

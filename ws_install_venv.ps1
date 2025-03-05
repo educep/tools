@@ -12,39 +12,6 @@ if (-not $envName) {
     exit
 }
 
-# Check if 'uv' is installed
-$uvInstalled = $false
-
-try {
-    $uvVersion = uv --version 2>$null
-    if ($uvVersion) {
-        $uvInstalled = $true
-        Write-Output "uv is already installed (Version: $uvVersion)."
-    }
-} catch {
-    Write-Output "uv is not installed. Installing now..."
-}
-
-# Install 'uv' if not installed
-if (-not $uvInstalled) {
-    Write-Output "Installing uv..."
-    Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://astral.sh/uv/install.ps1')
-
-    # Verify installation
-    try {
-        $uvVersion = uv --version 2>$null
-        if ($uvVersion) {
-            Write-Output "uv installed successfully (Version: $uvVersion)."
-            $uvInstalled = $true
-        } else {
-            Write-Output "uv installation failed. Please install manually."
-            exit 1
-        }
-    } catch {
-        Write-Output "uv installation failed. Please install manually."
-        exit 1
-    }
-}
 
 # Get the current username
 $username = $env:USERNAME
@@ -57,7 +24,6 @@ if (Test-Path $envPath) {
     Write-Output "Virtual environment already exists. Skipping creation."
 } else {
     # Create a virtual environment with uv
-    Write-Output "Creating virtual environment '$envName'..."
     uv venv $envPath
 }
 
@@ -65,7 +31,6 @@ if (Test-Path $envPath) {
 & "$envPath/Scripts/Activate.ps1"
 
 # Install dependencies using uv
-Write-Output "Installing dependencies from requirements.txt..."
 # uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 uv pip install -r requirements.txt
 

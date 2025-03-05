@@ -1,0 +1,25 @@
+
+# AWS PACKAGE
+boto3==1.35.29
+
+# ASYNC TASKS
+celery[sqs]
+ffmpeg-python==0.2.0
+# GENERAL USE
+# LOGGING
+loguru==0.7.2
+
+# API
+openai==1.55.2
+pandas==2.2.2
+pillow==11.0.0
+
+# LINTERS
+pre-commit==3.7.0
+
+# TEXT TO SPEECH TO TEXT
+pydub==0.25.1
+
+# UTILS
+python-dotenv==1.0.1
+yt-dlp==2024.11.18
