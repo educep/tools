@@ -12,12 +12,45 @@ repos:
         - id: trailing-whitespace
         - id: requirements-txt-fixer
 
+    - repo: https://github.com/pycqa/isort
+      rev: 5.12.0
+      hooks:
+        - id: isort
+          name: isort
+          language_version: python3.12
+
     - repo: https://github.com/psf/black
-      rev: 22.3.0  # Use the latest version or pin to a specific version
+      rev: 23.7.0
       hooks:
         - id: black
-          language_version: python3.9
-          additional_dependencies: ['tomli']
+          language_version: python3.12
+          args: ["--line-length=99"]
+
+    - repo: https://github.com/PyCQA/flake8
+      rev: 6.1.0
+      hooks:
+        - id: flake8
+          language_version: python3.12
+          additional_dependencies: ['flake8-bugbear', 'flake8-comprehensions']
+
+    # Also done in Makefile
+    # - repo: https://github.com/pre-commit/mirrors-mypy
+    #   rev: v1.5.1
+    #   hooks:
+    #     - id: mypy
+    #       additional_dependencies: [
+    #         'pandas-stubs',
+    #       ]
+    #       args: [
+    #         '--ignore-missing-imports',
+    #         '--disallow-untyped-defs',
+    #         '--check-untyped-defs',
+    #         '--warn-redundant-casts',
+    #         '--warn-unused-ignores',
+    #         '--warn-return-any',
+    #         '--strict-optional',
+    #         '--no-strict-optional',
+    #       ]
 
     - repo: local
       hooks:
@@ -27,50 +60,3 @@ repos:
           language: system
           pass_filenames: false
           always_run: true
-
-#    - repo: https://github.com/PyCQA/flake8
-#      rev: 4.0.1  # Use the latest version or pin to a specific version
-#      hooks:
-#        - id: flake8
-#          language_version: python3.9
-#          additional_dependencies: ['flake8-bugbear', 'flake8-comprehensions', 'flake8-bandit']
-
-#    - repo: https://github.com/pre-commit/mirrors-isort
-#      rev: v5.10.1  # Use the latest version or pin to a specific version
-#      hooks:
-#        - id: isort
-#          name: isort
-#          language_version: python3.9
-
-#    - repo: https://github.com/pre-commit/mirrors-mypy
-#      rev: v0.910  # Use the latest version or pin to a specific version
-#      hooks:
-#        - id: mypy
-#          language_version: python3.9
-
-#    - repo: https://github.com/PyCQA/bandit
-#      rev: 1.7.0  # Use the latest version or pin to a specific version
-#      hooks:
-#        - id: bandit
-#          name: bandit
-#          entry: bandit
-#          args: ['-r', '.', '-x', 'env, venv, .venv']
-#          language: python
-#          types: [python]
-#          language_version: python3.9
-#          pass_filenames: false
-
-#    - repo: https://github.com/pre-commit/mirrors-pylint/
-#      rev: v3.0.0a5  # Use the latest version or pin to a specific version
-#      hooks:
-#        - id: pylint
-#          name: pylint
-#          entry: pylint
-#          args:
-#            - '--disable=R,C'
-#            - '--errors-only'
-#            - '--init-hook'
-#            - 'import sys; sys.path.extend([".venv/Lib/site-packages"])'
-#          language: python
-#          types: [python]
-#          language_version: python3.9

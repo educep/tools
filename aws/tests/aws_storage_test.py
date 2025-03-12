@@ -2,13 +2,17 @@
 Created by Analitika at 19/08/2024
 contact@analitika.fr
 """
-import unittest
-from unittest.mock import patch, MagicMock
-from aws import S3Manager
-from dotenv import load_dotenv
-import os
 
+
+# External imports
 import json
+import unittest
+from unittest.mock import patch
+
+from aws import S3Manager
+
+# Internal imports
+from config import AWS_FOLDER
 
 """
 This is a test class for the S3Manager class. It tests the upload, download, and delete operations
@@ -22,12 +26,10 @@ class TestS3Manager(unittest.TestCase):
         """
         Set up the test case environment. Load environment variables and initialize the S3Manager.
         """
-        load_dotenv()
-        cls.aws_folder = os.getenv("AWS_FOLDER", "test-folder")
         cls.s3_manager = S3Manager()
         cls.test_dict = {"test": "test"}
         cls.file_name = "test.json"
-        cls.prefix = f"{cls.aws_folder}/00aa_test"
+        cls.prefix = f"{AWS_FOLDER}/00aa_test"
 
     @patch.object(S3Manager, "upload_json_file")
     @patch.object(S3Manager, "download_from_s3")
@@ -46,9 +48,7 @@ class TestS3Manager(unittest.TestCase):
         mock_delete.return_value = 0
 
         # Test upload
-        exit_code_1 = self.s3_manager.upload_json_file(
-            self.file_name, self.test_dict, self.prefix
-        )
+        exit_code_1 = self.s3_manager.upload_json_file(self.file_name, self.test_dict, self.prefix)
         self.assertEqual(exit_code_1, 0)
         mock_upload.assert_called_once_with(self.file_name, self.test_dict, self.prefix)
 
