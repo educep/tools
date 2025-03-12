@@ -1,20 +1,19 @@
+import functools
+import importlib
 from abc import ABC, abstractmethod
 from pathlib import Path
-import importlib
-import os
-import functools
 
 
 class LLMError(Exception):
     """Custom exception for LLM errors."""
 
-    def __init__(self, message):
+    def __init__(self, message: str) -> None:
         super().__init__(message)
 
 
 class Provider(ABC):
     @abstractmethod
-    def chat_completions_create(self, model, messages):
+    def chat_completions_create(self, model: str, messages: list[str]) -> None:
         """Abstract method for chat completion calls, to be implemented by each provider."""
         pass
 
@@ -25,7 +24,7 @@ class ProviderFactory:
     PROVIDERS_DIR = Path(__file__).parent / "providers"
 
     @classmethod
-    def create_provider(cls, provider_key, config):
+    def create_provider(cls, provider_key: str, config: dict) -> Provider:
         """Dynamically load and create an instance of a provider based on the naming convention."""
         # Convert provider_key to the expected module and class names
         provider_class_name = f"{provider_key.capitalize()}Provider"
@@ -47,7 +46,7 @@ class ProviderFactory:
 
     @classmethod
     @functools.cache
-    def get_supported_providers(cls):
+    def get_supported_providers(cls) -> list[str]:
         """List all supported provider names based on files present in the providers directory."""
         provider_files = Path(cls.PROVIDERS_DIR).glob("*_provider.py")
         return {file.stem.replace("_provider", "") for file in provider_files}

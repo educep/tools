@@ -1,11 +1,12 @@
 import os
 
 import groq
+
 from aisuite.provider import Provider
 
 
 class GroqProvider(Provider):
-    def __init__(self, **config):
+    def __init__(self, **config: dict) -> None:
         """
         Initialize the Groq provider with the given configuration.
         Pass the entire configuration dictionary to the Groq client constructor.
@@ -22,5 +23,5 @@ class GroqProvider(Provider):
         return self.client.chat.completions.create(
             model=model,
             messages=messages,
-            **kwargs  # Pass any additional arguments to the Groq API
+            **kwargs,  # Pass any additional arguments to the Groq API
         )

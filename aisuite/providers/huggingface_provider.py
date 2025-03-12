@@ -1,7 +1,9 @@
 import os
+
 import httpx
-from aisuite.provider import Provider, LLMError
+
 from aisuite.framework import ChatCompletionResponse
+from aisuite.provider import LLMError, Provider
 
 
 class HuggingfaceProvider(Provider):
@@ -13,7 +15,7 @@ class HuggingfaceProvider(Provider):
     https://huggingface.co/inference-endpoints/
     """
 
-    def __init__(self, **config):
+    def __init__(self, **config: dict) -> None:
         """
         Initialize the provider with the given configuration.
         The token is fetched from the config or environment variables.
@@ -28,7 +30,7 @@ class HuggingfaceProvider(Provider):
         # Optionally set a custom timeout (default to 30s)
         self.timeout = config.get("timeout", 30)
 
-    def chat_completions_create(self, model, messages, **kwargs):
+    def chat_completions_create(self, model: str, messages: list[str], **kwargs: dict) -> None:
         """
         Makes a request to the Inference API endpoint using httpx.
         """
@@ -61,7 +63,7 @@ class HuggingfaceProvider(Provider):
         Normalize the response to a common format (ChatCompletionResponse).
         """
         normalized_response = ChatCompletionResponse()
-        normalized_response.choices[0].message.content = response_data["choices"][0][
-            "message"
-        ]["content"]
+        normalized_response.choices[0].message.content = response_data["choices"][0]["message"][
+            "content"
+        ]
         return normalized_response

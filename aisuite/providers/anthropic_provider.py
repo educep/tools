@@ -1,6 +1,7 @@
 import anthropic
-from aisuite.provider import Provider
+
 from aisuite.framework import ChatCompletionResponse
+from aisuite.provider import Provider
 
 # Define a constant for the default max_tokens value
 DEFAULT_MAX_TOKENS = 4096

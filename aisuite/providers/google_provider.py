@@ -3,10 +3,9 @@
 import os
 
 import vertexai
-from vertexai.generative_models import GenerativeModel, GenerationConfig
+from vertexai.generative_models import GenerationConfig, GenerativeModel
 
-from aisuite.framework import ProviderInterface, ChatCompletionResponse
-
+from aisuite.framework import ChatCompletionResponse, ProviderInterface
 
 DEFAULT_TEMPERATURE = 0.7
 
@@ -53,17 +52,13 @@ class GoogleProvider(ProviderInterface):
         transformed_messages = self.transform_roles(messages)
 
         # Convert the messages to the format expected Google
-        final_message_history = self.convert_openai_to_vertex_ai(
-            transformed_messages[:-1]
-        )
+        final_message_history = self.convert_openai_to_vertex_ai(transformed_messages[:-1])
 
         # Get the last message from the transformed messages
         last_message = transformed_messages[-1]["content"]
 
         # Create the GenerativeModel with the specified model and generation configuration
-        model = GenerativeModel(
-            model, generation_config=GenerationConfig(temperature=temperature)
-        )
+        model = GenerativeModel(model, generation_config=GenerationConfig(temperature=temperature))
 
         # Start a chat with the GenerativeModel and send the last message
         chat = model.start_chat(history=final_message_history)
@@ -99,7 +94,5 @@ class GoogleProvider(ProviderInterface):
     def normalize_response(self, response):
         """Normalize the response from Google AI to match OpenAI's response format."""
         openai_response = ChatCompletionResponse()
-        openai_response.choices[0].message.content = (
-            response.candidates[0].content.parts[0].text
-        )
+        openai_response.choices[0].message.content = response.candidates[0].content.parts[0].text
         return openai_response

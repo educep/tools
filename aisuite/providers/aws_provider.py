@@ -1,8 +1,9 @@
 import os
 
 import boto3
-from aisuite.provider import Provider, LLMError
+
 from aisuite.framework import ChatCompletionResponse
+from aisuite.provider import Provider  # LLMError
 
 
 class AwsProvider(Provider):
@@ -33,12 +34,8 @@ class AwsProvider(Provider):
             **config: Configuration options for the provider.
 
         """
-        self.region_name = config.get(
-            "aws_region", os.getenv("AWS_REGION_NAME", "us-east-1")
-        )
-        self.aws_access_key = config.get(
-            "aws_access_key", os.getenv("AWS_BR_ACCESS_KEY_ID", "")
-        )
+        self.region_name = config.get("aws_region", os.getenv("AWS_REGION_NAME", "us-east-1"))
+        self.aws_access_key = config.get("aws_access_key", os.getenv("AWS_BR_ACCESS_KEY_ID", ""))
         self.aws_secret_access_key = config.get(
             "aws_secret_key", os.getenv("AWS_BR_SECRET_ACCESS_KEY", "")
         )
@@ -59,9 +56,9 @@ class AwsProvider(Provider):
     def normalize_response(self, response):
         """Normalize the response from the Bedrock API to match OpenAI's response format."""
         norm_response = ChatCompletionResponse()
-        norm_response.choices[0].message.content = response["output"]["message"][
-            "content"
-        ][0]["text"]
+        norm_response.choices[0].message.content = response["output"]["message"]["content"][0][
+            "text"
+        ]
         return norm_response
 
     def chat_completions_create(self, model, messages, **kwargs):

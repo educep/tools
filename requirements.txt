@@ -1,33 +1,17 @@
-# LOCAL PACKAGES
 -e .
 black==23.7.0
-
-# AWS PACKAGE
 boto3==1.35.29
-
-# ASYNC TASKS
-celery[sqs]
+celery[sqs]==5.4.0
 ffmpeg-python==0.2.0
 flake8==6.1.0
-
-# JUPYTER
-ipykernel
-# GENERAL USE
-# LOGGING
+ipykernel==6.29.5
 loguru==0.7.2
-
-# API
+mypy==1.5.1
 openai==1.55.2
 pandas==2.2.2
 pillow==11.0.0
-
-# LINTERS
 pre-commit==3.7.0
-pre-commit==3.7.0
-
-# TEXT TO SPEECH TO TEXT
 pydub==0.25.1
-
-# UTILS
 python-dotenv==1.0.1
+toml==0.10.2
 yt-dlp==2024.11.18

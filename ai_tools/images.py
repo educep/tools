@@ -4,32 +4,42 @@ contact@analitika.fr
 """
 # External imports
 from __future__ import annotations
-import json
-from openai import OpenAI
-from pydantic import BaseModel
-from typing import Optional, Literal
-import io
+
 import base64
-from PIL import Image
+import io
+import json
 from datetime import datetime
+from typing import Any, Callable, Generator, Literal, Optional
+
+from openai import OpenAI
+from PIL import Image
+from pydantic import BaseModel
 
 # Internal imports
-from config import OPENAI_API_KEY, AWS_FOLDER, S3_BUCKET_NAME, AWS_REGION
-from ai_prompts import ImagePrompt, PromptManager
+from ai_prompts import PromptManager
 from ai_tools.aws_bedrock import BedrockClient
 from aws import S3Manager
 
+# Internal imports
+from config import settings
+
 bucket = S3Manager()
+
+
+class ImagePrompt(BaseModel):
+    prompt: str
+    caption: str
+    alt_text: str
 
 
 # Custom field type for PIL Images
 class PILImageField:
     @classmethod
-    def __get_validators__(cls):
+    def __get_validators__(cls) -> Generator[Callable, None, None]:
         yield cls.validate
 
     @classmethod
-    def validate(cls, v, field):  # Added field parameter
+    def validate(cls, v: Any, field: Any) -> Image.Image:  # Added field parameter
         try:
             # Handle Streamlit's UploadedFile
             if hasattr(v, "getvalue"):  # Streamlit's UploadedFile has getvalue method
@@ -72,7 +82,7 @@ class ImageData(BaseModel):
             else None
         }
 
-    def dict(self, *args, **kwargs):
+    def dict(self, *args: Any, **kwargs: Any) -> dict:
         d = super().model_dump(*args, **kwargs)
         if d.get("image") and isinstance(d["image"], Image.Image):
             buffer = io.BytesIO()
@@ -83,8 +93,8 @@ class ImageData(BaseModel):
 
     @classmethod
     def from_streamlit_upload(
-        cls, uploaded_file, prompt: str, caption: str, alt_text: str
-    ):
+        cls, uploaded_file: Any, prompt: str, caption: str, alt_text: str
+    ) -> ImageData:
         """
         Create ImageData instance from Streamlit's uploaded file
         """
@@ -122,9 +132,7 @@ class ImageGeneration:
         self.provider = provider
         self.img_model = img_model
         if resolutions not in ["1024x1024", "1792x1024", "1024x1792"]:
-            raise ValueError(
-                "Invalid resolution. Must be 1024x1024, 1792x1024, or 1024x1792."
-            )
+            raise ValueError("Invalid resolution. Must be 1024x1024, 1792x1024, or 1024x1792.")
 
         self.resolutions = resolutions
         height, width = resolutions.split("x")
@@ -147,7 +155,7 @@ class ImageGeneration:
         strict = """I NEED to test how the tool works with extremely simple prompts.
                     DO NOT add any detail, just use it AS-IS:\n"""
         prompt = strict + image_prompt.prompt
-        client = OpenAI(api_key=OPENAI_API_KEY)
+        client = OpenAI(api_key=settings.OPENAI_API_KEY)
         response = client.images.generate(
             model=self.img_model,
             prompt=prompt,
@@ -168,9 +176,7 @@ class ImageGeneration:
 
         return image
 
-    def generate_image_prompt(
-        self, prompt: str, user_model: str = "gpt-4o-mini"
-    ) -> ImagePrompt:
+    def generate_image_prompt(self, prompt: str, user_model: str = "gpt-4o-mini") -> ImagePrompt:
         """
         Generate an image prompt using **OpenAI**'s API
         :param prompt: prompt to be used for the image generation
@@ -180,7 +186,7 @@ class ImageGeneration:
         if user_model not in ["gpt-4o-mini", "gpt-4o"]:
             raise NotImplementedError("Only available for OpenAI's models")
 
-        client = OpenAI(api_key=OPENAI_API_KEY)
+        client = OpenAI(api_key=settings.OPENAI_API_KEY)
         completion = client.beta.chat.completions.parse(
             model=user_model,
             temperature=0,
@@ -223,9 +229,7 @@ class ImageGeneration:
                 width=self.width,
                 height=self.height,
             )
-            image = completion.generate_image(
-                model_id=self.img_model, body=json.dumps(config)
-            )
+            image = completion.generate_image(model_id=self.img_model, body=json.dumps(config))
         else:
             raise NotImplementedError("Only available for OpenAI and AWS models")
 
@@ -242,51 +246,16 @@ class ImageGeneration:
 
         # We now store everything, we store errors in DB
         file_name_s3 = (
-            self.provider
-            + "_generated_image_"
-            + datetime.now().strftime("%Y%m%d%H%M%S")
-            + ".png"
+            self.provider + "_generated_image_" + datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
         )
-        folder = f"{AWS_FOLDER}/images"
-        bucket.upload_to_s3(file_name_s3, image, folder, content_type=f"image/png")
+        folder = f"{settings.AWS_FOLDER}/images"
+        bucket.upload_to_s3(file_name_s3, image, folder, content_type="image/png")
 
         if self.response_format == "url":
             image_data.url = image
         elif self.response_format == "b64_json":
-            url_aws = f"https://{S3_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com/{folder}/{file_name_s3}"
+            url_aws = f"https://{settings.S3_BUCKET_NAME}.s3.{settings.AWS_REGION}.amazonaws.com/{folder}/{file_name_s3}"
             image_data.image = image
             image_data.url = url_aws
 
         return image_data
-
-
-def test_generate_image():
-    """
-    Test the generate_image function
-    :return: None
-    """
-    content = "A cute baby sea otter wearing a beret"
-    # genimage = ImageGeneration(selected_image_model="openai:dall-e-3")
-    # image_data = genimage.generate_image(content)
-
-    genimage = ImageGeneration(selected_image_model="aws:amazon.nova-canvas-v1:0")
-    image_data = genimage.generate_image(content)
-
-    from wordpress_api import Post, Media, Category, Tag
-    from config import WP_URL, WP_USERNAME, WP_ACCESSKEY
-    from wordpress_api import WordPressAPI
-
-    api = WordPressAPI(WP_URL, WP_USERNAME, WP_ACCESSKEY)
-    media_data = Media(
-        title="title",
-        alt_text="alt_text",
-        caption="caption",
-        description="title",
-        status="publish",
-        meta={},
-    )
-    new_media = api.create_media(image_data.image, media=media_data)
-
-
-if __name__ == "__main__":
-    test_generate_image()

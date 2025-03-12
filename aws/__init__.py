@@ -4,3 +4,5 @@ contact@analitika.fr
 """
 
 from aws.aws_storage import S3Manager
+
+__all__ = ["S3Manager"]

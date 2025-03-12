@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "tools"
 version = "0.0.1"
-description = "MLE project"
+description = "Tools project"
 authors = [
   { name = "Eduardo Cepeda, Ph.D." }
 ]
@@ -21,7 +21,7 @@ dependencies = []
 # Add this section to specify packages explicitly
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["aws", "config", "aisuite", "ai_tools", "ai_prompts", "async_tasks", "excel_tools"]
+include = ["aws", "config", "aisuite", "ai_tools", "ai_prompts", "async_tasks"]
 
 [tool.black]
 line-length = 99

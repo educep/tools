@@ -12,7 +12,7 @@ from unittest.mock import patch
 from aws import S3Manager
 
 # Internal imports
-from config import AWS_FOLDER
+from config import settings
 
 """
 This is a test class for the S3Manager class. It tests the upload, download, and delete operations
@@ -21,6 +21,12 @@ on S3 using mocked responses from the S3Manager class.
 
 
 class TestS3Manager(unittest.TestCase):
+    # Declare class attributes with type annotations
+    s3_manager: S3Manager
+    test_dict: dict
+    file_name: str
+    prefix: str
+
     @classmethod
     def setUpClass(cls):
         """
@@ -29,7 +35,7 @@ class TestS3Manager(unittest.TestCase):
         cls.s3_manager = S3Manager()
         cls.test_dict = {"test": "test"}
         cls.file_name = "test.json"
-        cls.prefix = f"{AWS_FOLDER}/00aa_test"
+        cls.prefix = f"{settings.AWS_FOLDER}/00aa_test"
 
     @patch.object(S3Manager, "upload_json_file")
     @patch.object(S3Manager, "download_from_s3")

@@ -2,17 +2,18 @@
 Created by Analitika at 19/10/2024
 contact@analitika.fr
 """
-# External imports
-from celery import Celery
 import urllib.parse
 
+# External imports
+from celery import Celery
+
 # Internal imports
-from config import (
-    AWS_ACCOUNT_ID,
+from config.settings import (
     AWS_ACCESS_KEY_SQS_ID,
+    AWS_ACCOUNT_ID,
+    AWS_REGION,
     AWS_SECRET_ACCESS_SQS_KEY,
     AWS_SQS_QUEUE_NAME,
-    AWS_REGION,
 )
 
 """
@@ -27,6 +28,9 @@ test_task.delay()
 # from folders_with_tasks.tasks import test_task_child
 # test_task_child.delay()
 """
+
+if AWS_ACCESS_KEY_SQS_ID is None or AWS_SECRET_ACCESS_SQS_KEY is None:
+    raise ValueError("AWS_ACCESS_KEY_SQS_ID and AWS_SECRET_ACCESS_SQS_KEY must be set")
 
 # URL-encode the AWS secret key and access key
 encoded_access_key = urllib.parse.quote_plus(AWS_ACCESS_KEY_SQS_ID)
@@ -55,12 +59,12 @@ celery_app = Celery(
 )
 
 # here add the folder of your project with tasks
-folders_with_tasks = []
+folders_with_tasks: list[str] = []
 celery_app.autodiscover_tasks(folders_with_tasks)
 
 
 @celery_app.task
-def test_task():
+def test_task() -> str:
     import time
 
     time.sleep(10)

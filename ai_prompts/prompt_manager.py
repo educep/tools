@@ -4,22 +4,24 @@ contact@analitika.fr
 """
 
 from __future__ import annotations
+
 import json
-from datetime import datetime
 import re
-from zoneinfo import ZoneInfo
+from datetime import datetime
 from typing import Dict, List, Tuple
+from zoneinfo import ZoneInfo
+
+from aws import S3Manager
 
 # Internal imports
-from config import AWS_FOLDER
-from aws import S3Manager
+from config.settings import AWS_FOLDER
 
 
 class PromptManager:
     date_format: str = "%Y%m%d%H%M"
     subfolder: str = "prompts"
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.bucket = S3Manager()
         self.folder = f"{AWS_FOLDER}/{self.subfolder}"
 
@@ -82,9 +84,7 @@ class PromptManager:
         matches = list(dict.fromkeys(matches))
         return matches
 
-    def save_prompt(
-        self, category: str, name: str, prompt: str, description: str
-    ) -> str:
+    def save_prompt(self, category: str, name: str, prompt: str, description: str) -> str:
         """Save prompt to S3"""
         timestamp = datetime.now(ZoneInfo("Europe/Paris")).strftime(self.date_format)
         filename = f"{timestamp}_{name}.json"
@@ -97,9 +97,7 @@ class PromptManager:
         }
 
         json_bytes = json.dumps(data).encode("utf-8")
-        self.bucket.upload_to_s3(
-            filename, json_bytes, path, content_type="application/json"
-        )
+        self.bucket.upload_to_s3(filename, json_bytes, path, content_type="application/json")
 
         return path
 

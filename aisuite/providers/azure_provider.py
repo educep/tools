@@ -1,9 +1,9 @@
-import urllib.request
 import json
 import os
+import urllib.request
 
-from aisuite.provider import Provider
 from aisuite.framework import ChatCompletionResponse
+from aisuite.provider import Provider
 
 
 class AzureProvider(Provider):
@@ -37,9 +37,9 @@ class AzureProvider(Provider):
                 resp_json = json.loads(result)
                 completion_response = ChatCompletionResponse()
                 # TODO: Add checks for fields being present in resp_json.
-                completion_response.choices[0].message.content = resp_json["choices"][
-                    0
-                ]["message"]["content"]
+                completion_response.choices[0].message.content = resp_json["choices"][0][
+                    "message"
+                ]["content"]
                 return completion_response
 
         except urllib.error.HTTPError as error:

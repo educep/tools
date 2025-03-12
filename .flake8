@@ -1,6 +1,6 @@
 [flake8]
 max-line-length = 99
-extend-ignore = E501
+ignore = E501, W503, E203
     # E731,  # Do not assign a lambda expression, use a def
     # E266,  # Too many leading '#' for block comment
     # C901,  # Function is too complex
@@ -17,6 +17,3 @@ exclude =
     __pycache__,
     build,
     dist
-ignore = B008, W503
-    # B008    # function calls in argument defaults.
-    # W503    # line break before binary operator

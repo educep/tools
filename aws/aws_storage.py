@@ -2,13 +2,15 @@
 Created by Analitika at 27/03/2024
 contact@analitika.fr
 """
-# External imports
-import os
 import gzip
 import json
-from io import BytesIO
-from typing import Union, List
+
+# External imports
+import os
 import pickle
+from io import BytesIO
+from typing import List, Union
+
 import boto3  # AWS SDK for Python
 import pandas as pd
 from botocore.exceptions import ClientError
@@ -16,12 +18,7 @@ from loguru import logger
 from PIL import Image
 
 # Internal imports
-from config import (
-    AWS_ACCESS_KEY_ID,
-    AWS_REGION,
-    AWS_SECRET_ACCESS_KEY,
-    S3_BUCKET_NAME,
-)
+from config import settings
 
 
 class S3Manager:
@@ -30,9 +27,9 @@ class S3Manager:
         Initialize the S3Manager with AWS credentials.
         """
         self.s3_client = boto3.Session(
-            aws_access_key_id=AWS_ACCESS_KEY_ID,
-            aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-            region_name=AWS_REGION,
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            region_name=settings.AWS_REGION,
         ).client("s3")
 
     def upload_json_file(self, file_name: str, data: dict, folder: str) -> int:
@@ -47,7 +44,7 @@ class S3Manager:
             json_data = json.dumps(data, indent=4)
             s3_file_key = f"{folder}/{file_name}"
             self.s3_client.put_object(
-                Bucket=S3_BUCKET_NAME, Key=s3_file_key, Body=json_data
+                Bucket=settings.S3_BUCKET_NAME, Key=s3_file_key, Body=json_data
             )
             return 0
         except ClientError as e:
@@ -67,14 +64,14 @@ class S3Manager:
 
             while is_truncated:
                 list_kwargs = {
-                    "Bucket": S3_BUCKET_NAME,
+                    "Bucket": settings.S3_BUCKET_NAME,
                     "MaxKeys": 1000,  # Set to 1000 (AWS limit per request)
                 }
                 if continuation_token:
                     list_kwargs["ContinuationToken"] = continuation_token
 
                 response = self.s3_client.list_objects_v2(
-                    Bucket=S3_BUCKET_NAME, Prefix=folder
+                    Bucket=settings.S3_BUCKET_NAME, Prefix=folder
                 )
 
                 if "Contents" in response:
@@ -111,7 +108,7 @@ class S3Manager:
         try:
             s3_file_key = f"{folder}/{file_name}"
             self.s3_client.put_object(
-                Bucket=S3_BUCKET_NAME,
+                Bucket=settings.S3_BUCKET_NAME,
                 Key=s3_file_key,
                 Body=data,
                 ContentType=content_type,
@@ -130,7 +127,7 @@ class S3Manager:
         """
         try:
             s3_file_key = f"{folder}/{file_name}"
-            self.s3_client.delete_object(Bucket=S3_BUCKET_NAME, Key=s3_file_key)
+            self.s3_client.delete_object(Bucket=settings.S3_BUCKET_NAME, Key=s3_file_key)
             logger.info(f"Object {s3_file_key} deleted from S3.")
             return 0
         except ClientError as e:
@@ -144,7 +141,7 @@ class S3Manager:
         :return: True if the file exists, False otherwise
         """
         try:
-            self.s3_client.head_object(Bucket=S3_BUCKET_NAME, Key=key)
+            self.s3_client.head_object(Bucket=settings.S3_BUCKET_NAME, Key=key)
             return True
         except ClientError as e:
             if e.response["Error"]["Code"] == "404":
@@ -164,14 +161,14 @@ class S3Manager:
         s3_file_key = f"{folder}/{file_name}"
         if not self.check_file_exists(s3_file_key):
             logger.error(
-                f"File '{s3_file_key}' does not exist in bucket '{S3_BUCKET_NAME}'."
+                f"File '{s3_file_key}' does not exist in bucket '{settings.S3_BUCKET_NAME}'."
             )
             return None
 
         file_stream = BytesIO()
         try:
             self.s3_client.download_fileobj(
-                Bucket=S3_BUCKET_NAME, Key=s3_file_key, Fileobj=file_stream
+                Bucket=settings.S3_BUCKET_NAME, Key=s3_file_key, Fileobj=file_stream
             )
             file_stream.seek(0)
             # Handle gzip files
@@ -211,7 +208,7 @@ class S3Manager:
         """
         try:
             response = self.s3_client.list_objects_v2(
-                Bucket=S3_BUCKET_NAME, Prefix=old_folder
+                Bucket=settings.S3_BUCKET_NAME, Prefix=old_folder
             )
             if "Contents" not in response:
                 logger.info(f"No objects found in the folder: {old_folder}")
@@ -221,11 +218,11 @@ class S3Manager:
                 old_key = obj["Key"]
                 new_key = old_key.replace(old_folder, new_folder, 1)
                 self.s3_client.copy_object(
-                    Bucket=S3_BUCKET_NAME,
-                    CopySource={"Bucket": S3_BUCKET_NAME, "Key": old_key},
+                    Bucket=settings.S3_BUCKET_NAME,
+                    CopySource={"Bucket": settings.S3_BUCKET_NAME, "Key": old_key},
                     Key=new_key,
                 )
-                self.s3_client.delete_object(Bucket=S3_BUCKET_NAME, Key=old_key)
+                self.s3_client.delete_object(Bucket=settings.S3_BUCKET_NAME, Key=old_key)
                 logger.info(f"Moved {old_key} to {new_key}")
             logger.info(f"Folder renamed from {old_folder} to {new_folder}")
         except ClientError as e:
@@ -243,7 +240,7 @@ class S3Manager:
         file_path = os.path.join(folder_path, file_name)
 
         # Handle image files
-        image_extensions = (".png", ".jpg", ".jpeg", ".bmp", ".gif", ".tiff", ".webp")
+        # image_extensions = (".png", ".jpg", ".jpeg", ".bmp", ".gif", ".tiff", ".webp")
         if isinstance(content, Image.Image):
             content.save(file_path)
             return file_path

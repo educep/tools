@@ -1,7 +1,9 @@
 import os
+
 import httpx
-from aisuite.provider import Provider, LLMError
+
 from aisuite.framework import ChatCompletionResponse
+from aisuite.provider import LLMError, Provider
 
 
 class OllamaProvider(Provider):
@@ -13,15 +15,15 @@ class OllamaProvider(Provider):
     """
 
     _CHAT_COMPLETION_ENDPOINT = "/api/chat"
-    _CONNECT_ERROR_MESSAGE = "Ollama is likely not running. Start Ollama by running `ollama serve` on your host."
+    _CONNECT_ERROR_MESSAGE = (
+        "Ollama is likely not running. Start Ollama by running `ollama serve` on your host."
+    )
 
-    def __init__(self, **config):
+    def __init__(self, **config: dict) -> None:
         """
         Initialize the Ollama provider with the given configuration.
         """
-        self.url = config.get("api_url") or os.getenv(
-            "OLLAMA_API_URL", "http://localhost:11434"
-        )
+        self.url = config.get("api_url") or os.getenv("OLLAMA_API_URL", "http://localhost:11434")
 
         # Optionally set a custom timeout (default to 30s)
         self.timeout = config.get("timeout", 30)
@@ -54,12 +56,10 @@ class OllamaProvider(Provider):
         # Return the normalized response
         return self._normalize_response(response.json())
 
-    def _normalize_response(self, response_data):
+    def _normalize_response(self, response_data: dict) -> ChatCompletionResponse:
         """
         Normalize the API response to a common format (ChatCompletionResponse).
         """
         normalized_response = ChatCompletionResponse()
-        normalized_response.choices[0].message.content = response_data["message"][
-            "content"
-        ]
+        normalized_response.choices[0].message.content = response_data["message"]["content"]
         return normalized_response

@@ -1,9 +1,7 @@
 """
 Created by Analitika at 28/11/2024
 contact@analitika.fr
-"""
 
-"""
     ai.Client()
         Args:
             provider_configs (dict): A dictionary containing provider configurations.
@@ -18,28 +16,24 @@ contact@analitika.fr
                         "aws_region": "us-east-1"
                     }
                 }
-"""
 
+"""
 # External imports
 
 
 # Internal imports
 import aisuite as ai
-from config import provider_configs, COMPLETION_MODELS_LIST
-
+from config import provider_configs
 
 client = ai.Client(provider_configs=provider_configs)
 
 
 def content_generation(prompt: str, model: str):
-
     messages = [
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": prompt},
     ]
-    response = client.chat.completions.create(
-        model=model, messages=messages, temperature=0
-    )
+    response = client.chat.completions.create(model=model, messages=messages, temperature=0)
     return response.choices[0].message.content
 
 

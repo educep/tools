@@ -2,7 +2,7 @@ from .provider import ProviderFactory
 
 
 class Client:
-    def __init__(self, provider_configs: dict = {}):
+    def __init__(self, provider_configs: dict = None):
         """
         Initialize the client with provider configurations.
         Use the ProviderFactory to create provider instances.
@@ -21,20 +21,20 @@ class Client:
                     }
                 }
         """
+        if provider_configs is None:
+            provider_configs = {}
         self.providers = {}
         self.provider_configs = provider_configs
         self._chat = None
         self._initialize_providers()
 
-    def _initialize_providers(self):
+    def _initialize_providers(self) -> None:
         """Helper method to initialize or update providers."""
         for provider_key, config in self.provider_configs.items():
             provider_key = self._validate_provider_key(provider_key)
-            self.providers[provider_key] = ProviderFactory.create_provider(
-                provider_key, config
-            )
+            self.providers[provider_key] = ProviderFactory.create_provider(provider_key, config)
 
-    def _validate_provider_key(self, provider_key):
+    def _validate_provider_key(self, provider_key: str) -> str:
         """
         Validate if the provider key corresponds to a supported provider.
         """
@@ -48,7 +48,7 @@ class Client:
 
         return provider_key
 
-    def configure(self, provider_configs: dict = None):
+    def configure(self, provider_configs: dict | None = None) -> None:
         """
         Configure the client with provider configurations.
         """
@@ -87,9 +87,7 @@ class Completions:
         """
         # Check that correct format is used
         if ":" not in model:
-            raise ValueError(
-                f"Invalid model format. Expected 'provider:model', got '{model}'"
-            )
+            raise ValueError(f"Invalid model format. Expected 'provider:model', got '{model}'")
 
         # Extract the provider key from the model identifier, e.g., "google:gemini-xx"
         provider_key, model_name = model.split(":", 1)

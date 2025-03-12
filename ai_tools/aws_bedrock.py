@@ -4,31 +4,31 @@ contact@analitika.fr
 https://docs.aws.amazon.com/nova/latest/userguide/getting-started-api.html
 https://docs.aws.amazon.com/nova/latest/userguide/image-generation.html
 """
+import base64
+import io
+import json
+import warnings
+
 # External imports
 # import tiktoken
 import boto3
-import json
-from botocore.exceptions import ClientError
 from botocore.config import Config
+from botocore.exceptions import ClientError
 from loguru import logger
-import base64
-import io
-from PIL import Image
-import warnings
 
 # Internal imports
-from config import AWS_BR_ACCESS_KEY_ID, AWS_BR_SECRET_ACCESS_KEY, AWS_REGION
+from config import settings
 
 
 class ImageError(Exception):
     "Custom exception for errors returned by Amazon Nova Canvas"
 
-    def __init__(self, message):
+    def __init__(self, message: str) -> None:
         self.message = message
 
 
 class BedrockClient:
-    def __init__(self, region_name="us-east-1"):
+    def __init__(self, region_name: str = "us-east-1") -> None:
         """
         Initialize Bedrock client.
 
@@ -37,9 +37,9 @@ class BedrockClient:
         """
         self.client = boto3.Session(
             region_name=region_name,
-            aws_access_key_id=AWS_BR_ACCESS_KEY_ID,
-            aws_secret_access_key=AWS_BR_SECRET_ACCESS_KEY,
-        ).client("bedrock-runtime", config=Config(read_timeout=300))
+            aws_access_key_id=settings.AWS_BR_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_BR_SECRET_ACCESS_KEY,
+        ).client("bedrock-runtime", settings=Config(read_timeout=300))
 
     def generate_text(
         self, prompt, model_id="anthropic.claude-v2", max_tokens=1000, temperature=0.7
@@ -109,9 +109,7 @@ class BedrockClient:
             elif "nova" in model_id:
                 return response_body.get("output", "").strip()
             elif "titan-text" in model_id:
-                return (
-                    response_body.get("results", [{}])[0].get("outputText", "").strip()
-                )
+                return response_body.get("results", [{}])[0].get("outputText", "").strip()
 
         except ClientError as e:
             print(f"AWS API error: {e}")
@@ -120,9 +118,7 @@ class BedrockClient:
             print(f"Error generating completion: {e}")
             raise
 
-    def generate_image(
-        self, model_id="amazon.nova-canvas-v1:0", body=None
-    ) -> io.BytesIO:
+    def generate_image(self, model_id="amazon.nova-canvas-v1:0", body=None) -> io.BytesIO:
         """
         Generate an image using Amazon Nova Canvas model on demand.
         Args:
@@ -281,7 +277,8 @@ class BedrockClient:
 
             if (width, height) not in valid_resolutions:
                 warnings.warn(
-                    f"Invalid resolution for generation task. Must be one of {valid_resolutions}"
+                    f"Invalid resolution for generation task. Must be one of {valid_resolutions}",
+                    stacklevel=2,
                 )
 
         # Check maximum dimension
@@ -291,9 +288,7 @@ class BedrockClient:
 
         # Check aspect ratio (between 1:4 and 4:1)
         if aspect_ratio < 0.25 or aspect_ratio > 4.0:
-            raise ValueError(
-                "Aspect ratio must be between 1:4 and 4:1 for editing tasks"
-            )
+            raise ValueError("Aspect ratio must be between 1:4 and 4:1 for editing tasks")
 
         # Check total pixels
         if total_pixels > 4190000:
@@ -305,9 +300,7 @@ class BedrockClient:
         # Count tokens for the main text prompt
         # text_tokens = tokenizer.encode(text)
         if len(text) > 1024:
-            raise ValueError(
-                f"Text prompt exceeds 1024 characters (current: {len(text)})"
-            )
+            raise ValueError(f"Text prompt exceeds 1024 characters (current: {len(text)})")
 
         # negative_text_tokens = tokenizer.encode(text)
         if negative_text is not None and len(negative_text) > 512:
@@ -345,7 +338,7 @@ class BedrockClient:
         return config
 
 
-def test_text_generation():
+def test_text_generation() -> str:
     # Initialize the completion client
     completion = BedrockClient(region_name="us-east-1")
 
@@ -369,7 +362,7 @@ def test_text_generation():
         logger.critical(f"Failed to generate completion: {e}")
 
 
-def test_image_generation():
+def test_image_generation() -> io.BytesIO:
     completion = BedrockClient(region_name="us-east-1")
     model_id = "amazon.nova-canvas-v1:0"
     prompt = """A photograph of a cup of coffee from the side."""
@@ -383,22 +376,22 @@ def test_image_generation():
         seed=42,
     )
 
-    body = json.dumps(
-        {
-            "taskType": "TEXT_IMAGE",
-            "textToImageParams": {
-                "text": prompt,
-                "negative_text": "buildings people cars",
-            },
-            "imageGenerationConfig": {
-                "numberOfImages": 1,
-                "height": 1024,
-                "width": 1024,
-                "cfgScale": 8.0,
-                "seed": 0,
-            },
-        }
-    )
+    # body = json.dumps(
+    #     {
+    #         "taskType": "TEXT_IMAGE",
+    #         "textToImageParams": {
+    #             "text": prompt,
+    #             "negative_text": "buildings people cars",
+    #         },
+    #         "imageGenerationConfig": {
+    #             "numberOfImages": 1,
+    #             "height": 1024,
+    #             "width": 1024,
+    #             "cfgScale": 8.0,
+    #             "seed": 0,
+    #         },
+    #     }
+    # )
 
     config_body = json.dumps(config)
 

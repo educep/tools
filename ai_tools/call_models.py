@@ -2,17 +2,14 @@
 Created by Analitika at 27/03/2024
 contact@analitika.fr
 """
+from typing import Type
+
 # External imports
 from openai import OpenAI
 from pydantic import BaseModel
-from typing import Type
 
 # Internal imports
-from config import (
-    OPENAI_API_KEY,
-    COMPLETIONS_MODEL,
-    EMBEDDINGS_MODEL,
-)
+from config.settings import COMPLETIONS_MODEL, EMBEDDINGS_MODEL, OPENAI_API_KEY
 
 # Configure logging
 client = OpenAI(api_key=OPENAI_API_KEY)

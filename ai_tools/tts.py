@@ -8,14 +8,14 @@ contact@analitika.fr
 
 # External imports
 import os
-from openai import OpenAI
-import yt_dlp
+
 import ffmpeg
+import yt_dlp
+from openai import OpenAI
 from pydub import AudioSegment
 
-
 # Internal imports
-from config.settings import OPENAI_API_KEY, DATA_DIR
+from config.settings import DATA_DIR, OPENAI_API_KEY
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
@@ -24,7 +24,7 @@ ext = "mp3"
 output_folder = DATA_DIR / "output_tts"
 
 
-def concat(mp3_files: list[str]):
+def concat(mp3_files: list[str]) -> None:
     # List of MP3 files to merge
     # Load and merge MP3 files
     combined_audio = AudioSegment.empty()
@@ -36,8 +36,7 @@ def concat(mp3_files: list[str]):
     combined_audio.export(os.path.join(output_folder, "merged.mp3"), format="mp3")
 
 
-def segment_text(content: str, max_characters_count: int = 4096):
-
+def segment_text(content: str, max_characters_count: int = 4096) -> list[str]:
     # Split the content into paragraphs
     paragraphs = content.split("\n")
     chunks = []
@@ -45,9 +44,7 @@ def segment_text(content: str, max_characters_count: int = 4096):
 
     for paragraph in paragraphs:
         # If adding this paragraph exceeds the limit, finalize the current chunk
-        if (
-            len(current_chunk) + len(paragraph) + 1 > max_characters_count
-        ):  # +1 accounts for "\n"
+        if len(current_chunk) + len(paragraph) + 1 > max_characters_count:  # +1 accounts for "\n"
             chunks.append(current_chunk.strip())
             current_chunk = paragraph  # Start a new chunk with the current paragraph
         else:
@@ -73,7 +70,7 @@ def segment_audio(input_file) -> list:
     return names
 
 
-def extract_audio_from_youtube(video_url, output_audio_file, ext="mp3"):
+def extract_audio_from_youtube(video_url: str, output_audio_file: str, ext: str = "mp3") -> None:
     ydl_opts = {
         "format": "bestaudio/best",
         "postprocessors": [
@@ -165,7 +162,7 @@ def text_to_speech(my_text: str, filename: str):
     response.stream_to_file(filename)
 
 
-def read_text(file_path):
+def read_text(file_path: str) -> str:
     # Open and read a text file
     # file_path = 'example.txt'  # Replace with the path to your file
 
@@ -180,7 +177,6 @@ def read_text(file_path):
 
 
 if __name__ == "__main__":
-
     # Replace VIDEO_ID with the actual YouTube video ID
     video_url = "https://www.youtube.com/watch?v=gHfIW47p-lA"
     output_audio_file = "audio_output"  # Desired output file name
@@ -207,7 +203,7 @@ if __name__ == "__main__":
     text_to_speech(key_points, file_putput)
     # Convert the merged MP3 to WhatsApp-compatible format (OGG with OPUS codec)
     ffmpeg.input(file_putput).output(
-        os.path.join(output_folder, f"audio_summary.ogg"),
+        os.path.join(output_folder, "audio_summary.ogg"),
         acodec="libopus",  # OPUS codec
         audio_bitrate="16k",  # 16kbps bitrate
         ar="24000",  # 24kHz sample rate

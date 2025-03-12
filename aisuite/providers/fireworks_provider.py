@@ -1,7 +1,9 @@
 import os
+
 import httpx
-from aisuite.provider import Provider, LLMError
+
 from aisuite.framework import ChatCompletionResponse
+from aisuite.provider import LLMError, Provider
 
 
 class FireworksProvider(Provider):
@@ -42,9 +44,7 @@ class FireworksProvider(Provider):
 
         try:
             # Make the request to Fireworks AI endpoint.
-            response = httpx.post(
-                self.BASE_URL, json=data, headers=headers, timeout=self.timeout
-            )
+            response = httpx.post(self.BASE_URL, json=data, headers=headers, timeout=self.timeout)
             response.raise_for_status()
         except httpx.HTTPStatusError as http_err:
             raise LLMError(f"Fireworks AI request failed: {http_err}")
@@ -59,7 +59,7 @@ class FireworksProvider(Provider):
         Normalize the response to a common format (ChatCompletionResponse).
         """
         normalized_response = ChatCompletionResponse()
-        normalized_response.choices[0].message.content = response_data["choices"][0][
-            "message"
-        ]["content"]
+        normalized_response.choices[0].message.content = response_data["choices"][0]["message"][
+            "content"
+        ]
         return normalized_response

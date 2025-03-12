@@ -4,7 +4,9 @@
 class ProviderInterface:
     """Defines the expected behavior for provider-specific interfaces."""
 
-    def chat_completion_create(self, messages=None, model=None, temperature=0) -> None:
+    def chat_completion_create(
+        self, messages: list[str] | None = None, model: str = None, temperature: float = 0.0
+    ) -> None:
         """Create a chat completion using the specified messages, model, and temperature.
 
         This method must be implemented by subclasses to perform completions.
