@@ -2,14 +2,15 @@
 Created by Analitika at 27/03/2024
 contact@analitika.fr
 """
+# External imports
+from __future__ import annotations
+
 import gzip
 import json
-
-# External imports
 import os
 import pickle
 from io import BytesIO
-from typing import List, Union
+from typing import Any, List, Union
 
 import boto3  # AWS SDK for Python
 import pandas as pd
@@ -22,7 +23,7 @@ from config import settings
 
 
 class S3Manager:
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initialize the S3Manager with AWS credentials.
         """
@@ -228,7 +229,7 @@ class S3Manager:
         except ClientError as e:
             logger.info(f"Error renaming folder: {str(e)}")
 
-    def save_to_local_disk(self, content, file_name: str, folder_path: str):
+    def save_to_local_disk(self, content: Any, file_name: str, folder_path: str) -> str | None:
         """
         Save the downloaded content to the local disk, handling different file types properly.
 

@@ -118,7 +118,9 @@ class BedrockClient:
             print(f"Error generating completion: {e}")
             raise
 
-    def generate_image(self, model_id="amazon.nova-canvas-v1:0", body=None) -> io.BytesIO:
+    def generate_image(
+        self, model_id: str = "amazon.nova-canvas-v1:0", body: str | None = None
+    ) -> io.BytesIO:
         """
         Generate an image using Amazon Nova Canvas model on demand.
         Args:
@@ -169,7 +171,7 @@ class BedrockClient:
     def configure_text_to_image_params(
         cls,
         text: str,
-        negative_text: str = None,
+        negative_text: str | None = None,
         num_images: int = 1,
         height: int = 1024,
         width: int = 1024,
