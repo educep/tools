@@ -2,7 +2,7 @@ import os
 
 import boto3
 
-from aisuite.framework import ChatCompletionResponse
+from aisuite.framework.chat_completion_response import ChatCompletionResponse
 from aisuite.provider import Provider  # LLMError
 
 
@@ -53,7 +53,7 @@ class AwsProvider(Provider):
             "stopSequences",
         ]
 
-    def normalize_response(self, response):
+    def normalize_response(self, response: dict) -> ChatCompletionResponse:
         """Normalize the response from the Bedrock API to match OpenAI's response format."""
         norm_response = ChatCompletionResponse()
         norm_response.choices[0].message.content = response["output"]["message"]["content"][0][
@@ -61,7 +61,9 @@ class AwsProvider(Provider):
         ]
         return norm_response
 
-    def chat_completions_create(self, model, messages, **kwargs):
+    def chat_completions_create(
+        self, model: str, messages: list[dict], **kwargs
+    ) -> ChatCompletionResponse:
         # Any exception raised by Anthropic will be returned to the caller.
         # Maybe we should catch them and raise a custom LLMError.
         # https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference.html

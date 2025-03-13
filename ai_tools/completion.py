@@ -23,12 +23,12 @@ contact@analitika.fr
 
 # Internal imports
 import aisuite as ai
-from config import provider_configs
+from config.settings import provider_configs
 
 client = ai.Client(provider_configs=provider_configs)
 
 
-def content_generation(prompt: str, model: str):
+def content_generation(prompt: str, model: str) -> str:
     messages = [
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": prompt},
@@ -37,7 +37,7 @@ def content_generation(prompt: str, model: str):
     return response.choices[0].message.content
 
 
-def testing():
+def testing() -> None:
     models = [
         "deepseek:deepseek-chat",
         "openai:gpt-4o-mini",

@@ -6,7 +6,7 @@ from aisuite.provider import Provider  # LLMError
 
 
 class OpenaiProvider(Provider):
-    def __init__(self, **config):
+    def __init__(self, **config: dict) -> None:
         """
         Initialize the OpenAI provider with the given configuration.
         Pass the entire configuration dictionary to the OpenAI client constructor.

@@ -73,8 +73,8 @@ if DEEPSEEK_API_KEY:
     }
 if AWS_BR_ACCESS_KEY_ID:
     provider_configs["aws"] = {
-        "aws_access_key": AWS_BR_ACCESS_KEY_ID,
-        "aws_secret_key": AWS_BR_SECRET_ACCESS_KEY,
+        "aws_access_key": str(AWS_BR_ACCESS_KEY_ID),
+        "aws_secret_key": str(AWS_BR_SECRET_ACCESS_KEY),
         "aws_region": "us-east-1",
     }
 

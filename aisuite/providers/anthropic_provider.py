@@ -8,7 +8,7 @@ DEFAULT_MAX_TOKENS = 4096
 
 
 class AnthropicProvider(Provider):
-    def __init__(self, **config):
+    def __init__(self, **config: dict) -> None:
         """
         Initialize the Anthropic provider with the given configuration.
         Pass the entire configuration dictionary to the Anthropic client constructor.
@@ -16,7 +16,9 @@ class AnthropicProvider(Provider):
 
         self.client = anthropic.Anthropic(**config)
 
-    def chat_completions_create(self, model, messages, **kwargs):
+    def chat_completions_create(
+        self, model: str, messages: list[dict], **kwargs
+    ) -> ChatCompletionResponse:
         # Check if the fist message is a system message
         if messages[0]["role"] == "system":
             system_message = messages[0]["content"]
@@ -34,7 +36,7 @@ class AnthropicProvider(Provider):
             )
         )
 
-    def normalize_response(self, response):
+    def normalize_response(self, response: anthropic.messages.Message) -> ChatCompletionResponse:
         """Normalize the response from the Anthropic API to match OpenAI's response format."""
         normalized_response = ChatCompletionResponse()
         normalized_response.choices[0].message.content = response.content[0].text

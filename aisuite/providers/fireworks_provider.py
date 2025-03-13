@@ -13,7 +13,7 @@ class FireworksProvider(Provider):
 
     BASE_URL = "https://api.fireworks.ai/inference/v1/chat/completions"
 
-    def __init__(self, **config):
+    def __init__(self, **config: dict) -> None:
         """
         Initialize the Fireworks provider with the given configuration.
         The API key is fetched from the config or environment variables.
@@ -27,7 +27,9 @@ class FireworksProvider(Provider):
         # Optionally set a custom timeout (default to 30s)
         self.timeout = config.get("timeout", 30)
 
-    def chat_completions_create(self, model, messages, **kwargs):
+    def chat_completions_create(
+        self, model: str, messages: list[dict], **kwargs
+    ) -> ChatCompletionResponse:
         """
         Makes a request to the Fireworks AI chat completions endpoint using httpx.
         """
@@ -54,7 +56,7 @@ class FireworksProvider(Provider):
         # Return the normalized response
         return self._normalize_response(response.json())
 
-    def _normalize_response(self, response_data):
+    def _normalize_response(self, response_data: dict) -> ChatCompletionResponse:
         """
         Normalize the response to a common format (ChatCompletionResponse).
         """

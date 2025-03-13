@@ -17,7 +17,7 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 
 def get_embeddings(
     text: list,
-    model: str = EMBEDDINGS_MODEL,
+    model: str | None = EMBEDDINGS_MODEL,
     dimension: int = 1536,
 ) -> list:
     """
@@ -32,7 +32,7 @@ def get_embeddings(
     return [data.embedding for data in response.data]
 
 
-def generate_answer(prompt: str, user_model: Type[BaseModel]):
+def generate_answer(prompt: str, user_model: Type[BaseModel]) -> Type[BaseModel] | str:
     """
     ai_client: is the client to use: in this project we can use 2: Haskn to treat their Content Library,
                 ANK for the rest

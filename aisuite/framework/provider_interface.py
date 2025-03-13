@@ -1,11 +1,16 @@
 """The shared interface for model providers."""
 
+from typing import List, Optional
+
 
 class ProviderInterface:
     """Defines the expected behavior for provider-specific interfaces."""
 
     def chat_completion_create(
-        self, messages: list[str] | None = None, model: str = None, temperature: float = 0.0
+        self,
+        messages: Optional[List[str]] = None,
+        model: Optional[str] = None,
+        temperature: float = 0.0,
     ) -> None:
         """Create a chat completion using the specified messages, model, and temperature.
 

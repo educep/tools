@@ -2,6 +2,7 @@ import os
 
 import groq
 
+from aisuite.framework.chat_completion_response import ChatCompletionResponse
 from aisuite.provider import Provider
 
 
@@ -19,7 +20,9 @@ class GroqProvider(Provider):
             )
         self.client = groq.Groq(**config)
 
-    def chat_completions_create(self, model, messages, **kwargs):
+    def chat_completions_create(
+        self, model: str, messages: list[dict], **kwargs
+    ) -> ChatCompletionResponse:
         return self.client.chat.completions.create(
             model=model,
             messages=messages,

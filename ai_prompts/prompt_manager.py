@@ -8,7 +8,7 @@ from __future__ import annotations
 import json
 import re
 from datetime import datetime
-from typing import Dict, List, Tuple, cast
+from typing import cast
 from zoneinfo import ZoneInfo
 
 import pandas as pd
@@ -27,7 +27,7 @@ class PromptManager:
         self.bucket = S3Manager()
         self.folder = f"{AWS_FOLDER}/{self.subfolder}"
 
-    def parse_prompt_path(self, path: str) -> Tuple[str, str, str]:
+    def parse_prompt_path(self, path: str) -> tuple[str, str, str]:
         """Parse S3 path to extract category and name"""
         parts = path.split("/")
         category = parts[-2]
@@ -36,7 +36,7 @@ class PromptManager:
         name = timestamp_name[13:]  # Extract name after timestamp
         return category, timestamp, name
 
-    def get_prompts(self) -> List[Dict]:
+    def get_prompts(self) -> list[dict]:
         """
         Get all prompts from S3 bucket, keeping only the most recent version
         of each prompt (based on category and name combination)
@@ -82,7 +82,7 @@ class PromptManager:
         # Convert dictionary values back to a list
         return list(latest_prompts.values())
 
-    def extract_variables(self, prompt: str) -> List[Tuple[str, str]]:
+    def extract_variables(self, prompt: str) -> list[tuple[str, str]]:
         """Extract variables from prompt text using regex"""
         pattern = r"\{\{(\w+)\}\}"
         matches = re.findall(pattern, prompt)
@@ -107,7 +107,7 @@ class PromptManager:
 
         return path
 
-    def get_prompt(self, name: str) -> Dict | None:
+    def get_prompt(self, name: str) -> dict | None:
         """Get prompt from S3"""
         prompts = self.get_prompts()
         for prompt in prompts:
@@ -116,7 +116,7 @@ class PromptManager:
         return None
 
 
-def set_prompt(prompt_: str, description: str, variables: List[str]) -> Dict:
+def set_prompt(prompt_: str, description: str, variables: list[str]) -> dict:
     return {
         "prompt": prompt_.strip(),
         "description": description,

@@ -164,8 +164,10 @@ class BedrockClient:
         except ClientError as err:
             message = err.response["Error"]["Message"]
             logger.error("A client error occurred:", message)
+            raise
         except ImageError as err:
             logger.error(err.message)
+            raise
 
     @classmethod
     def configure_text_to_image_params(

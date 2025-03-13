@@ -22,7 +22,7 @@ class GoogleProvider(ProviderInterface):
         )
 
         if not self.project_id or not self.location or not self.app_creds_path:
-            raise EnvironmentError(
+            raise OSError(
                 "Missing one or more required Google environment variables: "
                 "GOOGLE_PROJECT_ID, GOOGLE_REGION, GOOGLE_APPLICATION_CREDENTIALS. "
                 "Please refer to the setup guide: /guides/google.md."
@@ -91,7 +91,9 @@ class GoogleProvider(ProviderInterface):
                 message["role"] = role
         return messages
 
-    def normalize_response(self, response):
+    def normalize_response(
+        self, response: vertexai.generative_models.Message
+    ) -> ChatCompletionResponse:
         """Normalize the response from Google AI to match OpenAI's response format."""
         openai_response = ChatCompletionResponse()
         openai_response.choices[0].message.content = response.candidates[0].content.parts[0].text

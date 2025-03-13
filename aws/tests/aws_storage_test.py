@@ -28,7 +28,7 @@ class TestS3Manager(unittest.TestCase):
     prefix: str
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """
         Set up the test case environment. Load environment variables and initialize the S3Manager.
         """
@@ -74,7 +74,7 @@ class TestS3Manager(unittest.TestCase):
         self.assertEqual(mock_download.call_count, 2)
 
     @classmethod
-    def tearDownClass(cls):
+    def tearDownClass(cls) -> None:
         """
         Clean up the test environment. Delete the test folder in S3.
         """

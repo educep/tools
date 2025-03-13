@@ -68,4 +68,3 @@ Licencia MIT
 
 ---
 *Nota: Mantén tus claves API seguras y nunca las subas al control de versiones.*
-

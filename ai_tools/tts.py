@@ -57,7 +57,7 @@ def segment_text(content: str, max_characters_count: int = 4096) -> list[str]:
     return chunks
 
 
-def segment_audio(input_file) -> list:
+def segment_audio(input_file: str) -> list[str]:
     # segments audio file to respect whisper size limits
     audio = AudioSegment.from_file(f"{input_file}.{ext}")
     chunk_size = 10 * 60 * 1000  # 10 minutes in milliseconds
@@ -92,7 +92,7 @@ def extract_audio_from_youtube(video_url: str, output_audio_file: str, ext: str 
         ydl.download([video_url])
 
 
-def transcribe_audio(audio_file_path):
+def transcribe_audio(audio_file_path: str) -> str:
     """
     for the available outputs formats:
     https://medium.com/@bezbos./openai-audio-whisper-api-guide-36e7272731dc
@@ -114,10 +114,12 @@ def transcribe_audio(audio_file_path):
             file=audio_file_,
             response_format="verbose_json",
         )
-    return transcription.model_dump()["text"]
+        output = transcription.model_dump()
+
+    return str(output["text"])
 
 
-def key_points_extraction(transcription):
+def key_points_extraction(transcription: str) -> str:
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         temperature=0,
@@ -148,10 +150,10 @@ def key_points_extraction(transcription):
         ],
     )
     response_ = response.model_dump()
-    return response_["choices"][0]["message"]["content"]
+    return str(response_["choices"][0]["message"]["content"])
 
 
-def text_to_speech(my_text: str, filename: str):
+def text_to_speech(my_text: str, filename: str) -> None:
     # The text to generate audio for. The maximum length is 4096 characters.
     response = client.audio.speech.create(
         model="tts-1",
@@ -167,13 +169,15 @@ def read_text(file_path: str) -> str:
     # file_path = 'example.txt'  # Replace with the path to your file
 
     try:
-        with open(file_path, "r") as file:
+        with open(file_path) as file:
             content = file.read()
             return content
     except FileNotFoundError:
         print(f"The file at {file_path} was not found.")
+        raise
     except Exception as e:
         print(f"An error occurred: {e}")
+        raise
 
 
 if __name__ == "__main__":

@@ -91,8 +91,9 @@ check-format:
 
 .PHONY: lint
 lint: format
-	flake8 $(PYTHON_FILES)
-	mypy $(PYTHON_FILES)
+	pre-commit run flake8
+	pre-commit run bandit
+	pre-commit run mypy
 	@echo "Linting completed."
 
 # Help

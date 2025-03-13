@@ -9,7 +9,7 @@ import base64
 import io
 import json
 from datetime import datetime
-from typing import Any, Callable, Generator, Literal, Optional
+from typing import Any, Callable, Generator, Literal
 
 from openai import OpenAI
 from PIL import Image
@@ -63,8 +63,8 @@ class ImageData(BaseModel):
     prompt: str
     caption: str
     alt_text: str
-    url: Optional[str] = None
-    image: Optional[PILImageField] = None
+    url: str | None = None
+    image: PILImageField | None = None
 
     class Config:
         arbitrary_types_allowed = True
@@ -118,8 +118,8 @@ class ImageGeneration:
     img_model: str
     resolutions: Literal["1024x1024", "1792x1024", "1024x1792"] = "1024x1024"
     response_format: Literal["b64_json", "url"] = "b64_json"
-    height: int = (1024,)
-    width: int = (1024,)
+    height: int = 1024
+    width: int = 1024
 
     def __init__(
         self,

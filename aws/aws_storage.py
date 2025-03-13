@@ -8,9 +8,9 @@ from __future__ import annotations
 import gzip
 import json
 import os
-import pickle
+import pickle  # nosec B403 - Used only for internal data, not user input
 from io import BytesIO
-from typing import Any, List, Union
+from typing import Any
 
 import boto3  # AWS SDK for Python
 import pandas as pd
@@ -52,7 +52,7 @@ class S3Manager:
             logger.error(str(e))
             return 1
 
-    def get_available_files(self, folder: str) -> List[str]:
+    def get_available_files(self, folder: str) -> list[str]:
         """
         List all files in a specific folder within an AWS S3 bucket.
         :param folder: The folder within the S3 bucket
@@ -153,7 +153,7 @@ class S3Manager:
 
     def download_from_s3(
         self, file_name: str, folder: str
-    ) -> Union[bytes, str, None, pd.DataFrame, Image.Image]:
+    ) -> bytes | str | None | pd.DataFrame | Image.Image:
         """
         Download a file from an AWS S3 bucket, with optional decompression for gzip files.
         :param file_name: The name of the file to be downloaded from S3 (with extension)
@@ -180,7 +180,20 @@ class S3Manager:
 
             # Handle pickle files
             if file_name.endswith(".pkl"):
-                return pickle.load(file_stream)
+                # Security warning: Only unpickle data from trusted sources
+                # This is safe as long as the pickle files in S3 are created by our application
+                # and not uploaded by users or external systems
+                try:
+                    return pickle.load(file_stream)  # nosec B301
+                except (
+                    pickle.UnpicklingError,
+                    AttributeError,
+                    EOFError,
+                    ImportError,
+                    IndexError,
+                ) as e:
+                    logger.error(f"Error unpickling file {s3_file_key}: {str(e)}")
+                    return None
 
             # Handle image files
             image_extensions = (
