@@ -8,8 +8,10 @@ from __future__ import annotations
 import json
 import re
 from datetime import datetime
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, cast
 from zoneinfo import ZoneInfo
+
+import pandas as pd
 
 from aws import S3Manager
 
@@ -63,13 +65,17 @@ class PromptManager:
                 # If this category/name combination hasn't been seen before, add it
                 if prompt_key not in latest_prompts:
                     data = self.bucket.download_from_s3(prompt, self.folder)
+                    if isinstance(data, pd.DataFrame):
+                        data = data.to_json()
                     prompt_data.update(json.loads(data))
                     latest_prompts[prompt_key] = prompt_data
                 # If we've seen this combination before, keep the newer version
                 else:
-                    existing_timestamp = latest_prompts[prompt_key]["timestamp"]
+                    existing_timestamp = cast(datetime, latest_prompts[prompt_key]["timestamp"])
                     if current_timestamp > existing_timestamp:
                         data = self.bucket.download_from_s3(prompt, self.folder)
+                        if isinstance(data, pd.DataFrame):
+                            data = data.to_json()
                         prompt_data.update(json.loads(data))
                         latest_prompts[prompt_key] = prompt_data
 
@@ -110,7 +116,7 @@ class PromptManager:
         return None
 
 
-def set_prompt(prompt_: str, description: str, variables: List[str]):
+def set_prompt(prompt_: str, description: str, variables: List[str]) -> Dict:
     return {
         "prompt": prompt_.strip(),
         "description": description,
@@ -118,7 +124,7 @@ def set_prompt(prompt_: str, description: str, variables: List[str]):
     }
 
 
-def generate_json():
+def generate_json() -> None:
     from ai_prompts.extraction import clean_content
     from ai_prompts.generation import html_builder
     from aws import S3Manager

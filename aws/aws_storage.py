@@ -62,18 +62,19 @@ class S3Manager:
         try:
             is_truncated = True  # Pagination flag
             continuation_token = None  # Continuation token for pagination
+            list_kwargs = {
+                "Bucket": settings.S3_BUCKET_NAME,
+                "Prefix": folder,
+                "MaxKeys": 1000,  # Set to 1000 (AWS limit per request)
+                "ContinuationToken": continuation_token,
+            }
 
             while is_truncated:
-                list_kwargs = {
-                    "Bucket": settings.S3_BUCKET_NAME,
-                    "MaxKeys": 1000,  # Set to 1000 (AWS limit per request)
-                }
-                if continuation_token:
-                    list_kwargs["ContinuationToken"] = continuation_token
+                list_kwargs["ContinuationToken"] = continuation_token
+                if list_kwargs["ContinuationToken"] is None:
+                    list_kwargs.pop("ContinuationToken", None)
 
-                response = self.s3_client.list_objects_v2(
-                    Bucket=settings.S3_BUCKET_NAME, Prefix=folder
-                )
+                response = self.s3_client.list_objects_v2(**list_kwargs)
 
                 if "Contents" in response:
                     for file in response["Contents"]:
@@ -261,7 +262,7 @@ class S3Manager:
         # If content is None, return None
         return None
 
-    def download_folder(self, folder_path: str, aws_path: str):
+    def download_folder(self, folder_path: str, aws_path: str) -> None:
         files = self.get_available_files(aws_path)
         for file_ in files:
             content = self.download_from_s3(file_, aws_path)
