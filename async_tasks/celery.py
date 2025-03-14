@@ -63,7 +63,7 @@ folders_with_tasks: list[str] = []
 celery_app.autodiscover_tasks(folders_with_tasks)
 
 
-@celery_app.task
+@celery_app.task  # type: ignore[misc]
 def test_task() -> str:
     import time
 

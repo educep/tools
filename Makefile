@@ -1,4 +1,4 @@
-# Makefile for managing the pharmaceutical data pipeline project
+# Makefile for managing the tools project
 
 # Variables
 VENV_NAME = .venv
@@ -29,21 +29,14 @@ endif
 venv:
 	uv venv $(VENV_NAME)
 	@echo "Virtual $(VENV_NAME) environment created."
+	@echo "To activate the virtual environment, please run: source $(VENV_NAME)/bin/activate"
 
-# Activate the virtual environment
-activate:
-ifeq ($(OS_NAME),Windows)
-	@$(VENV_NAME)\Scripts\activate
-else
-	@source $(VENV_NAME)/bin/activate
-endif
-	@echo "Virtual $(VENV_NAME) environment activated."
 
 # Install dependencies using uv
 install:
 	uv pip install -r requirements.txt
 	@echo "Dependencies installed."
-
+	@echo "To activate the virtual environment, please run: source $(VENV_NAME)/bin/activate or the corresponding command for your operating system."
 
 # Pre-commit hooks
 pre_commit:
@@ -53,17 +46,17 @@ pre_commit:
 # Clean up
 clean:
 ifeq ($(OS_NAME),Windows)
-	del /s /q venv
-	rmdir /s /q venv
+	del /s /q $(VENV_NAME)
+	rmdir /s /q $(VENV_NAME)
 else
-	rm -rf venv
+	rm -rf $(VENV_NAME)
 endif
 	@echo "Cleaned up the environment."
 
 
 # Tests
 test:
-	@echo "add tests here"
+	pytest
 	@echo "Tests executed."
 
 # Build the Docker image
@@ -79,33 +72,63 @@ run:
 # Linting and formatting
 .PHONY: format
 format:
-	black $(PYTHON_FILES)
-	isort $(PYTHON_FILES)
+	black --line-length=99 $(PYTHON_FILES)
+	isort --profile black --line-length 99 $(PYTHON_FILES)
 	@echo "Formatting completed."
 
 .PHONY: check-format
 check-format:
-	black --check $(PYTHON_FILES)
-	isort --check --diff $(PYTHON_FILES)
+	black --check --line-length=99 $(PYTHON_FILES)
+	isort --check --diff --profile black --line-length 99 $(PYTHON_FILES)
 	@echo "Format check completed."
 
+.PHONY: flake8
+flake8:
+	flake8 --max-line-length=99 --ignore=E501,W503,E203 $(PYTHON_FILES)
+	@echo "Flake8 check completed."
+
+.PHONY: bandit
+bandit:
+	bandit --skip=B101 -r $(PYTHON_FILES) --exclude tests/
+	@echo "Bandit security check completed."
+
+.PHONY: mypy
+mypy:
+	mypy --python-version=3.12 --warn-return-any --warn-unused-configs --disallow-untyped-defs --disallow-incomplete-defs --check-untyped-defs --disallow-untyped-decorators --no-implicit-optional --warn-redundant-casts --warn-unused-ignores --warn-no-return --warn-unreachable --strict-optional --ignore-missing-imports --implicit-reexport $(PYTHON_FILES)
+	@echo "MyPy type checking completed."
+
+.PHONY: pyupgrade
+pyupgrade:
+	pyupgrade --py312-plus $(PYTHON_FILES)
+	@echo "Python code upgraded to Python 3.12+ syntax."
+
+
 .PHONY: lint
-lint: format
-	pre-commit run flake8
-	pre-commit run bandit
-	pre-commit run mypy
-	@echo "Linting completed."
+lint: format flake8 bandit mypy
+	@echo "All linting checks completed."
+
+.PHONY: check-all
+check-all: check-format lint test
+	@echo "All checks and tests completed."
 
 # Help
 help:
-	@echo "Makefile for managing the pharmaceutical data pipeline project"
+	@echo "Makefile for tools"
 	@echo "Usage:"
 	@echo "  make venv         - Create a virtual environment"
 	@echo "  make activate     - Activate the virtual environment"
 	@echo "  make install      - Install dependencies using uv"
 	@echo "  make pre_commit   - Install pre-commit hooks"
-	@echo "  make lint         - Check code style with flake8, isort, black, and mypy"
-	@echo "  make format       - Format code with isort and black"
+	@echo "  make pyupgrade    - Upgrade Python syntax to 3.12+"
+	@echo "  make pre-commit-hooks - Run basic pre-commit hooks"
+	@echo "  make format       - Format code with black and isort"
+	@echo "  make check-format - Check formatting without changing files"
+	@echo "  make flake8       - Run flake8 linting"
+	@echo "  make bandit       - Run bandit security checks"
+	@echo "  make mypy         - Run mypy type checking"
+	@echo "  make lint         - Run all linting tools"
+	@echo "  make test         - Run pytest"
+	@echo "  make check-all    - Run all checks and tests"
 	@echo "  make clean        - Clean up the environment"
 	@echo "  make build        - Build the Docker image"
 	@echo "  make run          - Run the Docker container"

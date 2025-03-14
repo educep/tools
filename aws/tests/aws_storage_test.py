@@ -7,7 +7,7 @@ contact@analitika.fr
 # External imports
 import json
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from aws import S3Manager
 
@@ -40,7 +40,12 @@ class TestS3Manager(unittest.TestCase):
     @patch.object(S3Manager, "upload_json_file")
     @patch.object(S3Manager, "download_from_s3")
     @patch.object(S3Manager, "delete_object_from_s3")
-    def test_s3_operations(self, mock_delete, mock_download, mock_upload):
+    def test_s3_operations(
+        self,
+        mock_delete: MagicMock,
+        mock_download: MagicMock,
+        mock_upload: MagicMock,
+    ) -> None:
         """
         Test the upload, download, and delete operations on S3.
         python -m unittest .\test\test_aws_storage.py
