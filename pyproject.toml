@@ -21,7 +21,7 @@ dependencies = []
 # Add this section to specify packages explicitly
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["aws", "ai_tools", "config", "async_tasks"]
+include = ["aws", "ai_tools", "config", "async_tasks", "sql_tester"]
 
 [tool.black]
 line-length = 99

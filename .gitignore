@@ -175,10 +175,6 @@ next-env.d.ts
 */test
 */ignore_
 ignore_*
-data/
-/data/raw
-/data/batch_ids
-test.yaml
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
