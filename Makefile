@@ -35,6 +35,7 @@ venv:
 # Install dependencies using uv
 install:
 	uv pip install -r requirements.txt
+	uv pip install pandas-stubs  # Add pandas-stubs for mypy
 	@echo "Dependencies installed."
 	@echo "To activate the virtual environment, please run: source $(VENV_NAME)/bin/activate or the corresponding command for your operating system."
 
@@ -93,8 +94,8 @@ bandit:
 	@echo "Bandit security check completed."
 
 .PHONY: mypy
-mypy:
-	mypy --python-version=3.12 --warn-return-any --warn-unused-configs --disallow-untyped-defs --disallow-incomplete-defs --check-untyped-defs --disallow-untyped-decorators --no-implicit-optional --warn-redundant-casts --warn-unused-ignores --warn-no-return --warn-unreachable --strict-optional --ignore-missing-imports --implicit-reexport $(PYTHON_FILES)
+mypy:  ## Run mypy type checker
+	mypy --python-version 3.12 --config-file pyproject.toml --no-site-packages --ignore-missing-imports $(PYTHON_FILES)
 	@echo "MyPy type checking completed."
 
 .PHONY: pyupgrade
