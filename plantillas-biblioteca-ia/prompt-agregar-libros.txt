@@ -1,0 +1,88 @@
+==============================================================
+PROMPT — AGREGAR LIBROS NUEVOS A UNA BIBLIOTECA EXISTENTE
+==============================================================
+
+Usa este prompt cuando ya tienes la biblioteca configurada
+y quieres agregar los PDFs que dejaste en la carpeta raíz.
+
+--------------------------------------------------------------
+
+Vas a agregar los libros que están en la raíz de esta carpeta
+al índice de la biblioteca.
+
+Para cada libro:
+1. Lee las primeras páginas del PDF para extraer título, autores,
+   año de publicación y editorial exactos.
+2. Asígnalo al tema más apropiado según su contenido.
+3. Renómbralo con el formato estándar:
+   YYYY [Autor1~Autor2] Título Completo del Libro.pdf
+   (solo apellidos, separados por ~, sin "et al.")
+4. Muévelo a la carpeta del tema correspondiente.
+5. Crea la nota Obsidian en _vault/Books/ con el YAML completo
+   y una descripción de 2-4 frases.
+6. Actualiza el MOC del tema correspondiente en _vault/Topics/.
+7. Actualiza el INDEX.md: incrementa total_books, actualiza el
+   conteo del tema en la tabla, y añade la entrada en la lista.
+
+Reglas adicionales:
+- Si ya existe un libro con el mismo título y autores,
+  conserva el más reciente y descarta el antiguo.
+- No inventes libros relacionados: solo enlaza a títulos
+  que existan en el INDEX.
+- Si un libro tiene 4 o más autores, usa solo los primeros 3
+  en el nombre de archivo.
+
+--------------------------------------------------------------
+
+==============================================================
+PROMPT — CONFIGURACIÓN INICIAL (BIBLIOTECA NUEVA DESDE CERO)
+==============================================================
+
+Usa este prompt la primera vez, cuando aún no tienes nada.
+Reemplaza los valores entre corchetes con los tuyos.
+
+--------------------------------------------------------------
+
+Voy a crear una biblioteca personal de [TEMA GENERAL, ej: "libros
+de investigación en educación"] usando Obsidian y el sistema de
+carpetas estructurado.
+
+La carpeta raíz ya existe. Mis temas son:
+- 01 - [Nombre del tema 1]
+- 02 - [Nombre del tema 2]
+- 03 - [Nombre del tema 3]
+[agrega los que necesites]
+
+Por favor:
+1. Crea las subcarpetas de tema dentro de la raíz.
+2. Crea la carpeta _vault/Books/ y _vault/Topics/.
+3. Crea el archivo _vault/00 - INDEX.md con la estructura base
+   (frontmatter YAML, tabla de temas, secciones de libros vacías).
+4. Crea un archivo MOC en _vault/Topics/ para cada tema.
+5. Luego procesa los PDFs que están en la raíz de la carpeta
+   usando las mismas reglas del prompt anterior.
+
+--------------------------------------------------------------
+
+==============================================================
+PROMPT — AGREGAR UN SOLO LIBRO (SIN ARCHIVO PDF)
+==============================================================
+
+Usa este prompt cuando conoces los datos del libro pero no
+tienes el PDF todavía, o quieres añadirlo manualmente.
+
+--------------------------------------------------------------
+
+Agrega este libro a mi biblioteca:
+
+- Título: [título completo]
+- Autores: [nombre y apellido de cada autor]
+- Año: [año de publicación]
+- Editorial: [nombre de la editorial]
+- Tema: [tema al que pertenece, o "asígnalo tú"]
+- Formato disponible: [pdf / epub / ambos]
+
+Crea la nota Obsidian, actualiza el MOC del tema, y actualiza
+el INDEX. No hay archivo que mover — solo crea los metadatos.
+
+--------------------------------------------------------------
